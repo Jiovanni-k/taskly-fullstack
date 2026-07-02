@@ -17,17 +17,8 @@ export const getTodos =  async ( req: Request, res: Response ) => {
 
 export const createTodos = async ( req: Request, res: Response ) => {
 
-<<<<<<< HEAD
-     const { title }= req.body;
-=======
      const { title,userId }= req.body;
-    /*if ( !title ){
-        return res.status(400).json({
-            message : "title is required."
-        })
-    } */
->>>>>>> 1975bbc (feat: add user controller, service, route, and password hashing utility.)
-
+    
 try {
     const todo = await service.createTodo(title, userId);
         return res.status(201).json(todo);

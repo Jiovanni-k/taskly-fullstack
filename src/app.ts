@@ -9,15 +9,14 @@ app.use(logger);
 app.use(express.json());
 app.use("/todos", router);
 app.use("/users", userRouter);
-app.use((req,res)=>{
-    res.status(404).json({
-        message : "Route Not Found :("
-    });
-})
-
 app.get("/health", ( req , res )=>{
     res.status(200).json({
         status : "UP"
+    });
+})
+app.use((req,res)=>{
+    res.status(404).json({
+        message : "Route Not Found :("
     });
 })
 

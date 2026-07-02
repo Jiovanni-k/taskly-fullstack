@@ -18,11 +18,6 @@ export const getTodos =  async ( req: Request, res: Response ) => {
 export const createTodos = async ( req: Request, res: Response ) => {
 
      const { title }= req.body;
-    /*if ( !title ){
-        return res.status(400).json({
-            message : "title is required."
-        })
-    } */
 
 try {
     const todo = await service.createTodo(title);

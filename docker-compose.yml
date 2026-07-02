@@ -1,0 +1,37 @@
+services:
+
+  db:
+    image: postgres:16
+
+    container_name: todo-db
+
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: post1234
+      POSTGRES_DB: todo_api_db
+
+    ports:
+      - "5433:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  api:
+
+    build: .
+
+    container_name: todo-api
+
+    depends_on:
+      - db
+
+    ports:
+      - "3000:3000"
+
+    environment:
+      DATABASE_URL: postgresql://postgres:post1234@db:5432/todo_api_db
+
+volumes:
+  postgres_data:

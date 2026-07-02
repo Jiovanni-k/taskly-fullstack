@@ -7,13 +7,15 @@ const app = express();
 app.use(logger);
 app.use(express.json());
 app.use("/todos", router);
-
-
-
 app.use((req,res)=>{
     res.status(404).json({
-        error : "not_found",
-        message : "The requested route does not exist on this server."
+        message : "Route Not Found :("
+    });
+})
+
+app.get("/health", ( req , res )=>{
+    res.status(200).json({
+        status : "UP"
     });
 })
 

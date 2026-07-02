@@ -11,8 +11,9 @@ app.use("/todos", router);
 
 
 app.use((req,res)=>{
-    res.status(400).json({
-        message : "Route Not Found :("
+    res.status(404).json({
+        error : "not_found",
+        message : "The requested route does not exist on this server."
     });
 })
 

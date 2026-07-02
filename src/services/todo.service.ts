@@ -11,13 +11,13 @@ export const getTodoById = async ( id : string )=>{
     return await repository.findById(id);
 }
 
-export const createTodo = async ( title : string  )=>{
+export const createTodo = async ( title : string, userId:number)=>{
 
     if ( title.trim()=== ""){
         throw new Error ("title should not be empty.");
     }
      
-    return await repository.insert(title);
+    return await repository.insert(title, userId);
 }
 
 export const updateTodo = async ( id :string, title: string, completed:boolean)=>{

@@ -4,7 +4,7 @@ export const validation = ( req:Request, res:Response, next:NextFunction ) => {
 
     const { title , completed }= req.body;
     if ( !title ){
-        res.status(400).json({
+        return res.status(400).json({
             message : "Title is Required!! "
         });
     }

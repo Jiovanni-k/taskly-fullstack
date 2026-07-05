@@ -16,25 +16,25 @@ export const insert = async (  title : string )=>{
     })
 }
 
-export const findById = async ( id:number )=>{
+export const findById = async ( id: string )=>{
     return await prisma.todos.findUnique({
         where : { id }
     })
 }
 
-export const update = async ( id:number, title:string, completed: boolean )=>{
+export const update = async ( id:string, title:string, completed: boolean )=>{
     return await prisma.todos.update({
-        where : {id : id},
+        where : {id},
         data :{
-            title : title ,
-            completed : completed
+            title  ,
+            completed 
         }
     })
 }
 
-export const remove = async ( id : number )=>{
+export const remove = async ( id : string )=>{
     await prisma.todos.delete({
-        where : { id : id }
+        where : { id  }
     });
     return true;
 }

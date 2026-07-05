@@ -1,8 +1,16 @@
 import app  from "../../app.js";
-import { describe, expect, it } from "vitest";
+import { beforeEach, afterEach ,describe, expect, it } from "vitest";
 import request from "supertest";
+import { prisma } from "../../config/prisma.js";
 
 describe ("Todo list integration tests.", ( )=>{
+    beforeEach ( async()=>{
+        await prisma.todos.deleteMany();
+    });
+    afterEach(async()=>{
+        await prisma.$disconnect();
+    });
+    
     it("should get all the todos", async()=>{
         const response = await request(app).get("/todos");
 
@@ -55,7 +63,8 @@ describe ("Todo list integration tests.", ( )=>{
     });
 
     it("should return 404 when updating non existent todo", async()=>{
-        const response = await request(app).put(`/todos/9999`).send({
+        const nonExistentId = "550e8400-e29b-41d4-a716-446655440099"; // Random UUID not in the Database
+        const response = await request(app).put(`/todos/${nonExistentId}`).send({
             title : "Anything",
             completed : false
         });
@@ -73,6 +82,16 @@ describe ("Todo list integration tests.", ( )=>{
         expect(response.status).toBe(400); // Because i should update the completed as well.
     })
 
+    
+    it ("should return 400 when the Id is not a valid UUID", async()=>{
+        const response = await request(app).put("/todos/999").send({
+            title: "Not Going to Work",
+            completed: true
+        });
+        
+        expect( response.status).toBe(400);
+    })
+
     it("should delete todo", async()=>{
         const created = await request(app).post("/todos").send({
             title : "deleted"
@@ -85,6 +104,7 @@ describe ("Todo list integration tests.", ( )=>{
         const getRes = await request(app).get(`/todos/${id}`);
         expect(getRes.status).toBe(404);
     })
+
 });
 
 

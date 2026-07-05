@@ -31,7 +31,7 @@ try {
 }
 
 export const getTodoById =  async ( req: Request , res : Response ) => {
-        const id = Number(req.params.id);
+    const id = String ( req.params.id );
     try {
         const todo = await service.getTodoById(id);
         
@@ -54,7 +54,8 @@ export const getTodoById =  async ( req: Request , res : Response ) => {
 export const updateTodo = async ( req : Request, res: Response ) => {
 
     const { title, completed } = req.body;
-    const id = Number( req.params.id);
+    
+     const id = String ( req.params.id );
 
         try {
             const todo = await service.updateTodo(id, title, completed);
@@ -82,8 +83,7 @@ export const updateTodo = async ( req : Request, res: Response ) => {
 }
 
 export const deleteTodo = async ( req:Request, res:Response )=>{
-
-    const id = Number (req.params.id);
+     const id = String ( req.params.id );
     try {
         const todo = await service.deleteTodo(id);
         if ( !todo ){

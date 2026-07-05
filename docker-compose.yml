@@ -28,7 +28,7 @@ services:
       - db
 
     ports:
-      - "3000:3000"
+      - "3001:3000"
 
     environment:
       DATABASE_URL: postgresql://postgres:post1234@db:5432/todo_api_db

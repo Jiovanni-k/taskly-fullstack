@@ -1,5 +1,5 @@
 import app  from "../../app.js";
-import { beforeEach, afterEach ,describe, expect, it } from "vitest";
+import { beforeEach, afterAll ,describe, expect, it } from "vitest";
 import request from "supertest";
 import { prisma } from "../../config/prisma.js";
 
@@ -7,7 +7,8 @@ describe ("Todo list integration tests.", ( )=>{
     beforeEach ( async()=>{
         await prisma.todos.deleteMany();
     });
-    afterEach(async()=>{
+
+    afterAll(async()=>{
         await prisma.$disconnect();
     });
     

@@ -17,6 +17,7 @@ jobs:
 
     env:
       DATABASE_URL: postgresql://postgres:post1234@localhost:5432/todo_api_db
+      TEST_DATABASE_URL: postgresql://postgres:post1234@localhost:5432/todo_api_db
 
     services:
       postgres:

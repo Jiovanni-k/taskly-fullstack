@@ -7,7 +7,7 @@ export const getAllTodos = async () => {
     return todo;
 }
 
-export const getTodoById = async ( id : number )=>{
+export const getTodoById = async ( id : string )=>{
     return await repository.findById(id);
 }
 
@@ -20,7 +20,7 @@ export const createTodo = async ( title : string  )=>{
     return await repository.insert(title);
 }
 
-export const updateTodo = async ( id :number, title: string, completed:boolean)=>{
+export const updateTodo = async ( id :string, title: string, completed:boolean)=>{
 
     if ( title === undefined || completed === undefined ){
        return { error : "MISSING_FIELD"};
@@ -35,7 +35,7 @@ export const updateTodo = async ( id :number, title: string, completed:boolean)=
     
 }
 
-export const deleteTodo = async ( id : number )=>{
+export const deleteTodo = async ( id : string )=>{
     
     return await repository.remove(id);
 }

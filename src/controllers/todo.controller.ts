@@ -7,7 +7,7 @@ export const getTodos =  async ( req: Request, res: Response ) => {
         const todo = await service.getAllTodos();
        return res.status(200).json(todo);
     }
-    catch( error ){
+    catch( _error ){
        return res.status(500).json({
             message : "Error displaying todos."
         })
@@ -23,7 +23,7 @@ try {
     const todo = await service.createTodo(title, userId);
         return res.status(201).json(todo);
     }
-    catch ( error ){
+    catch ( _error ){
        return res.status(500).json({
             message : "Error creating todo."
         })
@@ -42,7 +42,7 @@ export const getTodoById =  async ( req: Request , res : Response ) => {
         }
         return res.status(200).json(todo);
     }
-    catch( error ){
+    catch( _error ){
         return res.status(500).json({
             message : "Error displaying todo."
         })
@@ -74,7 +74,7 @@ export const updateTodo = async ( req : Request, res: Response ) => {
 
           return res.status(200).json(todo);
         }
-        catch ( error ){
+        catch ( _error ){
            return res.status(500).json({
                 message : "Error Updating the todo."
             })
@@ -94,7 +94,7 @@ export const deleteTodo = async ( req:Request, res:Response )=>{
         return res.status(204).send();
         
     }
-    catch ( error ){
+    catch ( _error ){
        return res.status(500).json({
             message : "Error Deleting the Todo."
         })

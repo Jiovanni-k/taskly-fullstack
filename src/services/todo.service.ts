@@ -40,5 +40,11 @@ export const updateTodo = async ( id :string, title: string, completed:boolean)=
 
 export const deleteTodo = async ( id : string )=>{
     
+    const exist = await repository.findById(id);
+
+    if ( !exist ){
+        return null;
+    }
+
     return await repository.remove(id);
 }

@@ -35,7 +35,7 @@ export const update = async ( id:string, title:string, completed: boolean )=>{
 
 export const remove = async ( id : string )=>{
     await prisma.todos.delete({
-        where : { id  }
+        where : { id }
     });
     return true;
 }

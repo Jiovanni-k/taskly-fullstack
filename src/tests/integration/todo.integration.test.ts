@@ -4,8 +4,18 @@ import request from "supertest";
 import { prisma } from "../../config/prisma.js";
 
 describe ("Todo list integration tests.", ( )=>{
+    let userId : string;
+
     beforeEach ( async()=>{
         await prisma.todos.deleteMany();
+        await prisma.user.deleteMany();
+        const user = await prisma.user.create({
+            data:{
+                email:"test@gmail.com",
+                password:"password123"
+            }
+        })
+        userId=user.id;
     });
 
     afterAll(async()=>{
@@ -21,7 +31,8 @@ describe ("Todo list integration tests.", ( )=>{
     
     it("should create todo", async ()=>{
         const response = await request(app).post("/todos").send({
-            title : "Testing"
+            title : "Testing",
+            userId : userId
         });
         expect(response.status).toBe(201);
         expect(response.body).toHaveProperty("id");
@@ -32,7 +43,8 @@ describe ("Todo list integration tests.", ( )=>{
 
     it("should get todo by Id", async ()=>{
         const created = await request(app).post(`/todos`).send({
-            title : "Test Creation"
+            title : "Test Creation",
+            userId:userId
         });
         const id = created.body.id;
         const response = await request(app).get(`/todos/${id}`);
@@ -40,25 +52,29 @@ describe ("Todo list integration tests.", ( )=>{
         expect(response.body).toEqual({
             id : id,
             title : "Test Creation",
-            completed : false
+            completed : false,
+            userId:userId
         });
         });
     
     
     it ("should update Todo", async ()=>{
         const created = await request(app).post("/todos").send({
-            title : "old title"
+            title : "old title",
+            userId:userId
         });
         const id = created.body.id;
         const response = await request(app).put(`/todos/${id}`).send({
             title : "new title",
-            completed : true
+            completed : true,
+            userId:userId
         });
         expect(response.status).toBe(200);
         expect(response.body).toEqual({
             id : id,
             title : "new title",
-            completed : true
+            completed : true,
+            userId:userId
         });
 
     });
@@ -74,7 +90,8 @@ describe ("Todo list integration tests.", ( )=>{
 
     it ("should return 400 when updating a todo with a missing requirement", async()=>{
         const created = await request(app).post("/todos").send({
-            title : "Finish the Task."
+            title : "Finish the Task.",
+            userId:userId
         });
         const id = created.body.id;
         const response = await request(app).put( `/todos/${id}`).send({
@@ -95,7 +112,8 @@ describe ("Todo list integration tests.", ( )=>{
 
     it("should delete todo", async()=>{
         const created = await request(app).post("/todos").send({
-            title : "deleted"
+            title : "deleted",
+            userId:userId
         });
 
         const id = created.body.id;

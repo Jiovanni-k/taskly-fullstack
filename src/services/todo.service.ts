@@ -11,12 +11,12 @@ export const getTodoById = async ( id : string )=>{
     return await repository.findById(id);
 }
 
-export const createTodo = async ( title : string, userId:number)=>{
+export const createTodo = async ( title : string, userId:string)=>{
 
     if ( !title ||title.trim()=== ""){
         throw new Error ("title should not be empty.");
     }
-    if ( !userId){
+    if ( !userId || userId.trim()===""){
         throw new Error("userId is required.");
     }
      

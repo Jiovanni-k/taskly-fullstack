@@ -9,9 +9,10 @@ vi.mock("../../repositories/todo.repository.js");
 describe ("Todo list Service testing",  ()=>{
 
     const todoId = "550e8400-e29b-41d4-a716-446655440000"; //random UUID for testing purposes
+    const userId = "11111111-1111-4111-8111-111111111111";
 
     it("should throw error when title is empty", async ()=>{
-        await expect(service.createTodo("",1)).rejects.toThrow("title should not be empty");
+        await expect(service.createTodo("",userId)).rejects.toThrow("title should not be empty");
 
     });
 
@@ -20,9 +21,9 @@ describe ("Todo list Service testing",  ()=>{
             id : todoId,
             title : "Clean Room",
             completed : false,
-            userId:1
+            userId : userId
         });
-        const result = await service.createTodo("Clean Room", 1);
+        const result = await service.createTodo("Clean Room", userId);
         expect ( result.title ).toBe("Clean Room");
     })
 
@@ -48,21 +49,22 @@ describe ("Todo list Service testing",  ()=>{
             id : todoId,
             title : "old title",
             completed : false,
-            userId: 1
+            userId : userId
         });
 
         vi.mocked(repository.update).mockResolvedValue({
             id : todoId,
             title : "new title",
             completed : true,
-            userId: 1
+            userId : userId
         });
 
         const result = await service.updateTodo(todoId,"new title", true);
         expect ( result ).toEqual ({
             id : todoId, 
             title : "new title", 
-            completed : true
+            completed : true,
+            userId : userId
         });
     })
 });                                        

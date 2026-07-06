@@ -7,7 +7,7 @@ export const findAll= async ()=>{
     
 }
 
-export const insert = async (  title : string , userId: number )=>{
+export const insert = async (  title : string , userId: string )=>{
     return await prisma.todos.create({
         data: {
             title ,

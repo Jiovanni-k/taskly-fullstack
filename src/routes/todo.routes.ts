@@ -6,6 +6,7 @@ import { authenticate} from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 router.get("/", getTodos);
+
 router.post("/", authenticate, validation ,createTodos);
 router.get("/:id", authenticate, validateUuid,getTodoById);
 router.put("/:id" , authenticate, validateUuid,updateTodo);

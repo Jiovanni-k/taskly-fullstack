@@ -38,3 +38,15 @@ export const me = async ( req:Request, res:Response )=>{
         user : req.user
     });
 }
+
+export const listUsers = async(req: Request, res:Response)=>{
+    try{
+        const users = await service.listUsers();
+        return res.status(200).json(users);
+    }
+    catch (_error){
+        return res.status(500).json({
+            message : "Error listing users."
+        });
+    }
+}

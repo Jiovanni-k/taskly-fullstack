@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import * as service from "../../services/user.service.js";
 import * as repository from "../../repositories/user.repository.js";
 import { hashPassword } from "../../utils/hash.js";
@@ -10,6 +10,10 @@ describe("User Service testing", () => {
     const userId = "11111111-1111-4111-8111-111111111111";
     const email = "test@gmail.com";
     const password = "password123";
+
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
 
     describe("register", () => {
         it("should throw error when email is missing", async () => {
@@ -98,6 +102,40 @@ describe("User Service testing", () => {
                 email,
                 role: "user"
             });
+        });
+    });
+
+    describe("listUsers", () => {
+        it("should return all users without passwords", async () => {
+            vi.mocked(repository.findAll).mockResolvedValue([
+                {
+                    id: userId,
+                    email,
+                    role: "user"
+                },
+                {
+                    id: "22222222-2222-4222-8222-222222222222",
+                    email: "admin@gmail.com",
+                    role: "admin"
+                }
+            ]);
+
+            const result = await service.listUsers();
+
+            expect(repository.findAll).toHaveBeenCalled();
+            expect(result).toEqual([
+                {
+                    id: userId,
+                    email,
+                    role: "user"
+                },
+                {
+                    id: "22222222-2222-4222-8222-222222222222",
+                    email: "admin@gmail.com",
+                    role: "admin"
+                }
+            ]);
+            expect(result[0]).not.toHaveProperty("password");
         });
     });
 });

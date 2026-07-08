@@ -22,3 +22,13 @@ export const findById = async (id :string)=>{
     });
 }
 
+export const findAll = async ()=>{
+    return await prisma.user.findMany({
+        select : {
+            id : true,
+            email : true,
+            role : true
+        }
+    });
+};
+

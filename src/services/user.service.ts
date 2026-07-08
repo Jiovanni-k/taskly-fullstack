@@ -2,6 +2,11 @@ import * as repo from "../repositories/user.repository.js";
 import { hashPassword, comparePassword} from "../utils/hash.js";
 import { signToken } from "../utils/jwt.js";
 
+
+export const listUsers = async ()=>{
+    return await repo.findAll();
+}
+
 export const register= async ( email:string, password:string)=>{
     if (!email || !password){
         throw new Error("Email and Password are required.");

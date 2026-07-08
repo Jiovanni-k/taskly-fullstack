@@ -17,10 +17,10 @@ export const getTodos =  async ( req: Request, res: Response ) => {
 
 export const createTodos = async ( req: Request, res: Response ) => {
 
-     const { title,userId }= req.body;
+     const { title }= req.body;
     
 try {
-    const todo = await service.createTodo(title, userId);
+    const todo = await service.createTodo(title, req.user!.id);
 
     if (todo && "error" in todo) {
             if (todo.error === "USER_NOT_FOUND") {
@@ -45,11 +45,16 @@ try {
 export const getTodoById =  async ( req: Request , res : Response ) => {
     const id = String ( req.params.id );
     try {
-        const todo = await service.getTodoById(id);
+        const todo = await service.getTodoById(id, req.user!.id, req.user!.role);
         
         if ( !todo ){
            return res.status(404).json({
                 message : "Todo Not Found :("
+            });
+        }
+        if ( "error" in todo ){
+            return res.status(403).json({
+                message : "Forbidden. You do not have permission to access this todo."
             });
         }
         return res.status(200).json(todo);
@@ -70,7 +75,7 @@ export const updateTodo = async ( req : Request, res: Response ) => {
      const id = String ( req.params.id );
 
         try {
-            const todo = await service.updateTodo(id, title, completed);
+            const todo = await service.updateTodo(id, title, completed, req.user!.id, req.user!.role);
 
             if ( !todo ){
                 return res.status(404).json({
@@ -79,6 +84,11 @@ export const updateTodo = async ( req : Request, res: Response ) => {
             }
             
             if ( "error" in todo ){
+                if ( todo.error === "FORBIDDEN" ){
+                    return res.status(403).json({
+                        message : "Forbidden. You do not have permission to modify this todo."
+                    });
+                }
                 return res.status(400).json({
                     message : "Title and Completed are required."
                 });
@@ -97,12 +107,19 @@ export const updateTodo = async ( req : Request, res: Response ) => {
 export const deleteTodo = async ( req:Request, res:Response )=>{
      const id = String ( req.params.id );
     try {
-        const todo = await service.deleteTodo(id);
+        const todo = await service.deleteTodo(id, req.user!.id, req.user!.role);
+        
         if ( !todo ){
             return res.status(404).json({
                 message : "Todo Not Found:("
             })
         }
+        if ( "error" in todo ){
+            return res.status(403).json({
+                message : "Forbidden. You do not have permission to delete this todo."
+            });
+        }
+
         return res.status(204).send();
         
     }

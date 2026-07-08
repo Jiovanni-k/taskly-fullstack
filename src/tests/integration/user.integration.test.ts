@@ -2,6 +2,7 @@ import app from "../../app.js";
 import { beforeEach, afterAll, describe, expect, it } from "vitest";
 import request from "supertest";
 import { prisma } from "../../config/prisma.js";
+import { hashPassword } from "../../utils/hash.js";
 
 describe("User auth integration tests.", () => {
     const email = "auth-test@gmail.com";
@@ -105,6 +106,65 @@ describe("User auth integration tests.", () => {
 
             expect(response.status).toBe(200);
             expect(response.body.user.email).toBe(email);
+        });
+    });
+
+    describe("GET /users", () => {
+        it("should reject requests with no token", async () => {
+            const response = await request(app).get("/users");
+
+            expect(response.status).toBe(401);
+        });
+
+        it("should reject a normal user", async () => {
+            await request(app).post("/users/register").send({ email, password });
+            const loginResponse = await request(app).post("/users/login").send({
+                email,
+                password
+            });
+
+            const response = await request(app)
+                .get("/users")
+                .set("Authorization", `Bearer ${loginResponse.body.token}`);
+
+            expect(response.status).toBe(403);
+        });
+
+        it("should let a seeded admin list users without passwords", async () => {
+            await request(app).post("/users/register").send({ email, password });
+            await prisma.user.create({
+                data: {
+                    email: "admin@gmail.com",
+                    password: await hashPassword(password),
+                    role: "admin"
+                }
+            });
+
+            const adminLogin = await request(app).post("/users/login").send({
+                email: "admin@gmail.com",
+                password
+            });
+
+            const response = await request(app)
+                .get("/users")
+                .set("Authorization", `Bearer ${adminLogin.body.token}`);
+
+            expect(response.status).toBe(200);
+            expect(response.body).toHaveLength(2);
+            expect(response.body).toEqual(
+                expect.arrayContaining([
+                    expect.objectContaining({
+                        email,
+                        role: "user"
+                    }),
+                    expect.objectContaining({
+                        email: "admin@gmail.com",
+                        role: "admin"
+                    })
+                ])
+            );
+            expect(response.body[0]).toHaveProperty("id");
+            expect(response.body[0]).not.toHaveProperty("password");
         });
     });
 });

@@ -1,6 +1,7 @@
 import { describe , expect, it , vi} from "vitest"; 
 import * as service from "../../services/todo.service.js";
 import * as repository from "../../repositories/todo.repository.js";
+import { title } from "process";
 // Only tests the methods in the service layer.
 
 vi.mock("../../repositories/todo.repository.js");
@@ -24,7 +25,7 @@ describe ("Todo list Service testing",  ()=>{
             userId : userId
         });
         const result = await service.createTodo("Clean Room", userId);
-        expect ( result.title ).toBe("Clean Room");
+        expect ( result,title ).toBe("Clean Room");
     })
 
     

@@ -21,6 +21,18 @@ export const createTodos = async ( req: Request, res: Response ) => {
     
 try {
     const todo = await service.createTodo(title, userId);
+
+    if (todo && "error" in todo) {
+            if (todo.error === "USER_NOT_FOUND") {
+                return res.status(404).json({
+                    message: "User Not Found"
+                });
+            }
+
+            return res.status(400).json({
+                message: "Title and userId are required."
+            });
+        }
         return res.status(201).json(todo);
     }
     catch ( _error ){

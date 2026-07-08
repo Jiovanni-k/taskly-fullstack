@@ -1,0 +1,110 @@
+import app from "../../app.js";
+import { beforeEach, afterAll, describe, expect, it } from "vitest";
+import request from "supertest";
+import { prisma } from "../../config/prisma.js";
+
+describe("User auth integration tests.", () => {
+    const email = "auth-test@gmail.com";
+    const password = "password123";
+
+    beforeEach(async () => {
+        await prisma.todos.deleteMany();
+        await prisma.user.deleteMany();
+    });
+
+    afterAll(async () => {
+        await prisma.$disconnect();
+    });
+
+    describe("POST /users/register", () => {
+        it("should register a new user", async () => {
+            const response = await request(app).post("/users/register").send({
+                email,
+                password
+            });
+
+            expect(response.status).toBe(201);
+            expect(response.body).toHaveProperty("id");
+            expect(response.body.email).toBe(email);
+            expect(response.body).not.toHaveProperty("password");
+        });
+
+        it("should not register the same email twice", async () => {
+            await request(app).post("/users/register").send({ email, password });
+
+            const response = await request(app).post("/users/register").send({
+                email,
+                password
+            });
+
+            expect(response.status).toBe(400);
+            expect(response.body.message).toBe("Email already exists.");
+        });
+    });
+
+    describe("POST /users/login", () => {
+        beforeEach(async () => {
+            await request(app).post("/users/register").send({ email, password });
+        });
+
+        it("should log in with correct credentials and return a token", async () => {
+            const response = await request(app).post("/users/login").send({
+                email,
+                password
+            });
+
+            expect(response.status).toBe(200);
+            expect(response.body).toHaveProperty("token");
+            expect(response.body.user.email).toBe(email);
+        });
+
+        it("should reject an incorrect password", async () => {
+            const response = await request(app).post("/users/login").send({
+                email,
+                password: "wrong-password"
+            });
+
+            expect(response.status).toBe(401);
+        });
+
+        it("should reject a non-existent email", async () => {
+            const response = await request(app).post("/users/login").send({
+                email: "nobody@gmail.com",
+                password
+            });
+
+            expect(response.status).toBe(401);
+        });
+    });
+
+    describe("GET /users/me", () => {
+        it("should reject requests with no token", async () => {
+            const response = await request(app).get("/users/me");
+            expect(response.status).toBe(401);
+        });
+
+        it("should reject requests with an invalid token", async () => {
+            const response = await request(app)
+                .get("/users/me")
+                .set("Authorization", "Bearer not-a-real-token");
+
+            expect(response.status).toBe(401);
+        });
+
+        it("should return the authenticated user with a valid token", async () => {
+            await request(app).post("/users/register").send({ email, password });
+            const loginResponse = await request(app).post("/users/login").send({
+                email,
+                password
+            });
+            const token = loginResponse.body.token;
+
+            const response = await request(app)
+                .get("/users/me")
+                .set("Authorization", `Bearer ${token}`);
+
+            expect(response.status).toBe(200);
+            expect(response.body.user.email).toBe(email);
+        });
+    });
+});

@@ -1,5 +1,6 @@
 
 import * as repository from "../repositories/todo.repository.js";
+import * as userRepository from "../repositories/user.repository.js";
 
 export const getAllTodos = async () => {
 
@@ -13,11 +14,14 @@ export const getTodoById = async ( id : string )=>{
 
 export const createTodo = async ( title : string, userId:string)=>{
 
-    if ( !title ||title.trim()=== ""){
-        throw new Error ("title should not be empty.");
-    }
     if ( !userId || userId.trim()===""){
-        throw new Error("userId is required.");
+        return { error: "MISSING_USER_ID"};
+    }
+
+    const user = await userRepository.findById(userId);
+
+    if (!user) {
+        return { error: "USER_NOT_FOUND" };
     }
      
     return await repository.insert(title, userId);
@@ -25,13 +29,14 @@ export const createTodo = async ( title : string, userId:string)=>{
 
 export const updateTodo = async ( id :string, title: string, completed:boolean)=>{
 
+    const exist = await repository.findById(id);
+
+    if (!exist) {
+        return null;
+    }
+
     if ( title === undefined || completed === undefined ){
        return { error : "MISSING_FIELD"};
-        }
-
-        const exist = await repository.findById(id);
-        if ( !exist ){
-            return null;
         }
         
         return await repository.update(id,title,completed);

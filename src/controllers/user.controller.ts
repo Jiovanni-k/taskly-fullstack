@@ -1,6 +1,10 @@
 import { Request,Response } from "express";
 import * as service from "../services/user.service.js";
 
+const getErrorMessage = (error: unknown) => {
+    return error instanceof Error ? error.message : "Unexpected error.";
+};
+
 export const register = async(req: Request, res:Response)=>{
     
     try{
@@ -12,9 +16,9 @@ export const register = async(req: Request, res:Response)=>{
             email: user.email
         });
     }
-    catch (error:any){
+    catch (error: unknown){
         return res.status(400).json({
-            message : error.message
+            message : getErrorMessage(error)
         });
     }
 }
@@ -26,9 +30,9 @@ export const login = async ( req:Request,res:Response)=>{
         const result = await service.login(email,password);
         return res.status(200).json(result);
     }
-    catch (error:any){
+    catch (error: unknown){
         return res.status(401).json({
-            message : error.message
+            message : getErrorMessage(error)
         });
     }
 };

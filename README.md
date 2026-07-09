@@ -30,12 +30,19 @@ The project follows a clean architecture using routes, controllers, and middlewa
 ## Project Structure
 
 src/
+
 ├── server.ts
+
 ├── app.ts
+
 ├── routes/
+
 ├── controllers/
+
 ├── middleware/
+
 ├── models/
+
 ├── data/
 
 ---

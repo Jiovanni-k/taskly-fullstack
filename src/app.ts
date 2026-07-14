@@ -3,6 +3,8 @@ import router from "./routes/todo.routes.js";
 import userRouter from "./routes/user.routes.js";
 import { logger } from "./middleware/logger.middleware.js";
 import passport from "./config/passport.js";
+import swaggerUi from "swagger-ui-express";
+import { swaggerSpec } from "./config/swagger.js";
 
 const app = express();
 
@@ -11,6 +13,7 @@ app.use(express.json());
 app.use(passport.initialize());
 app.use("/todos", router);
 app.use("/users", userRouter);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.get("/health", ( req , res )=>{
     res.status(200).json({
         status : "UP"

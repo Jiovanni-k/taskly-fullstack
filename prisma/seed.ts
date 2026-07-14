@@ -13,14 +13,10 @@ async function main() {
     const hashed = await hashPassword(password);
 
     const admin = await prisma.user.upsert({
-        where: { email },
-        update: { role: "admin" },
-        create: {
-            email,
-            password: hashed,
-            role: "admin"
-        }
-    });
+    where: { email },
+    update: { role: "admin", password: hashed },
+    create: { email, password: hashed, role: "admin" }
+});
 
     console.log(`Admin ready: ${admin.email} (role: ${admin.role})`);
 }

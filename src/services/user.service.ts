@@ -12,6 +12,10 @@ export const register= async ( email:string, password:string)=>{
         throw new Error("Email and Password are required.");
     }
 
+    if (process.env.ADMIN_EMAIL && email.toLowerCase() === process.env.ADMIN_EMAIL.toLowerCase()){
+        throw new Error("This email is reserved and cannot be used for registration.");
+    }
+
     const exist = await repo.findByEmail(email);
     if ( exist ){
         throw new Error("Email already exists.");

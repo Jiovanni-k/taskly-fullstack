@@ -45,8 +45,8 @@ router.post("/register", register);
  *               email: { type: string, format: email }
  *               password: { type: string }
  *     responses:
- *       200: { description: Login successful, returns token and user }
- *       401: { description: Invalid credentials }
+   *       201: { description: User created }
+   *       400: { description: Validation error, email already exists, or email is reserved for the admin account }
  */
 router.post("/login", login);
 

@@ -41,6 +41,14 @@ describe("User auth integration tests.", () => {
             expect(response.status).toBe(400);
             expect(response.body.message).toBe("Email already exists.");
         });
+
+        it("should reject registering with the reserved admin email", async () => {
+            const response = await request(app)
+                .post("/users/register")
+                .send({ email: process.env.ADMIN_EMAIL, password: "whatever123" });
+
+            expect(response.status).toBe(400);
+        });
     });
 
     describe("POST /users/login", () => {

@@ -1,11 +1,27 @@
 import { Request , Response } from "express";
 import * as service from "../services/todo.service.js";
+import { parseQueryParams } from "../utils/queryBuilder.js";
 
 export const getTodos =  async ( req: Request, res: Response ) => {
 
     try{
-        const todo = await service.getAllTodos();
-       return res.status(200).json(todo);
+        const hasQueryParams = Object.keys(req.query).length > 0;
+        const query = hasQueryParams ? parseQueryParams(req.query) : undefined;
+        const todo = await service.getAllTodos(query);
+
+        if (query){
+            const { todos, total }= todo as any;
+            const pages = Math.ceil(total / query.limit);
+            return res.status(200).json({
+                data: todos,
+                pagination: {
+                page: query.page,
+                limit: query.limit,
+                total, pages
+                }
+            })
+        }
+        return res.status(200).json(todo);
     }
     catch( _error ){
        return res.status(500).json({
@@ -20,6 +36,7 @@ export const createTodos = async ( req: Request, res: Response ) => {
      const { title }= req.body;
     
 try {
+
     const todo = await service.createTodo(title, req.user!.id);
 
     if (todo && "error" in todo) {
@@ -35,6 +52,7 @@ try {
         }
         return res.status(201).json(todo);
     }
+    
     catch ( _error ){
        return res.status(500).json({
             message : "Error creating todo."

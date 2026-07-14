@@ -1,14 +1,15 @@
 
 import * as repository from "../repositories/todo.repository.js";
 import * as userRepository from "../repositories/user.repository.js";
+import { TodoQuery } from "../dtos/todo.dto.js";
 
 const isOwner = ( todoUserId:string, requesterId:string, requesterRole:string)=>{
     return todoUserId === requesterId || requesterRole === "admin";
 }
 
-export const getAllTodos = async () => {
+export const getAllTodos = async ( query ? : TodoQuery ) => {
 
-    const todo = await repository.findAll();
+    const todo = await repository.findAll(query);
     return todo;
 }
 

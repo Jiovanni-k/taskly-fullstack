@@ -1,9 +1,44 @@
 
 import { prisma } from "../config/prisma.js";
+import { TodoQuery} from "../dtos/todo.dto.js";
 
-export const findAll= async ()=>{
+export const findAll= async ( query?:TodoQuery) =>{
 
-    return await prisma.todos.findMany();
+    if ( !query ){
+        return await prisma.todos.findMany();
+    }
+
+   const { page, limit, sortBy, order, completed, title } = query;
+
+   const where: any = {};
+
+   if ( completed !== undefined ){
+    where.completed=completed;
+   }
+
+   if ( title ){
+    where.title={
+        contains: title,
+        mode: 'insensitive'
+    }
+   }
+
+   const orderBy: any ={};
+
+   orderBy[sortBy || 'createdAt']= order || 'desc';
+
+   const offset = ( page -1 ) * limit ;
+
+   const [ todos, total ]= await Promise.all([
+    prisma.todos.findMany({
+        where,
+        orderBy,
+        skip:offset,
+        take:limit
+    }),
+    prisma.todos.count({where})
+   ]);
+   return { todos , total }
     
 }
 

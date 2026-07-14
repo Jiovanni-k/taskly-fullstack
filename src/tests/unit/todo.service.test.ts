@@ -13,6 +13,10 @@ describe ("Todo list Service testing",  ()=>{
     const todoId = "550e8400-e29b-41d4-a716-446655440000"; //random UUID for testing purposes
     const userId = "11111111-1111-4111-8111-111111111111";
     const otherUserId = "22222222-2222-4222-8222-222222222222";
+    const todoTimestamps = {
+        createdAt: new Date("2026-07-09T00:00:00.000Z"),
+        updatedAt: new Date("2026-07-09T00:00:00.000Z")
+    };
 
     beforeEach(() => {
         vi.clearAllMocks();
@@ -34,7 +38,8 @@ describe ("Todo list Service testing",  ()=>{
             id : todoId,
             title : "Clean Room",
             completed : false,
-            userId : userId
+            userId : userId,
+            ...todoTimestamps
         });
         const result = await service.createTodo("Clean Room", userId);
         if ("error" in result) {
@@ -45,8 +50,8 @@ describe ("Todo list Service testing",  ()=>{
 
     it ("should return every todo regardless of who is asking (public route)", async()=>{
         vi.mocked(repository.findAll).mockResolvedValue([
-            { id : todoId, title : "mine", completed : false, userId : userId },
-            { id : "other-id", title : "not mine", completed : false, userId : otherUserId }
+            { id : todoId, title : "mine", completed : false, userId : userId, ...todoTimestamps },
+            { id : "other-id", title : "not mine", completed : false, userId : otherUserId, ...todoTimestamps }
         ]);
 
         const result = await service.getAllTodos();
@@ -74,18 +79,20 @@ describe ("Todo list Service testing",  ()=>{
             id : todoId,
             title : "old title",
             completed : false,
-            userId : userId
+            userId : userId,
+            ...todoTimestamps
         });
 
         vi.mocked(repository.update).mockResolvedValue({
             id : todoId,
             title : "new title",
             completed : true,
-            userId : userId
+            userId : userId,
+            ...todoTimestamps
         });
 
         const result = await service.updateTodo(todoId,"new title", true, userId, "user");
-        expect ( result ).toEqual ({
+        expect ( result ).toMatchObject ({
             id : todoId, 
             title : "new title", 
             completed : true,
@@ -98,7 +105,8 @@ describe ("Todo list Service testing",  ()=>{
             id : todoId,
             title : "old title",
             completed : false,
-            userId : userId
+            userId : userId,
+            ...todoTimestamps
         });
 
         const result = await service.updateTodo(todoId,"new title", true, otherUserId, "user");
@@ -110,18 +118,20 @@ describe ("Todo list Service testing",  ()=>{
             id : todoId,
             title : "old title",
             completed : false,
-            userId : userId
+            userId : userId,
+            ...todoTimestamps
         });
 
         vi.mocked(repository.update).mockResolvedValue({
             id : todoId,
             title : "new title",
             completed : true,
-            userId : userId
+            userId : userId,
+            ...todoTimestamps
         });
 
         const result = await service.updateTodo(todoId,"new title", true, otherUserId, "admin");
-        expect ( result ).toEqual ({
+        expect ( result ).toMatchObject ({
             id : todoId, 
             title : "new title", 
             completed : true,
@@ -134,7 +144,8 @@ describe ("Todo list Service testing",  ()=>{
             id : todoId,
             title : "old title",
             completed : false,
-            userId : userId
+            userId : userId,
+            ...todoTimestamps
         });
 
         const result = await service.getTodoById(todoId, otherUserId, "user");
@@ -146,7 +157,8 @@ describe ("Todo list Service testing",  ()=>{
             id : todoId,
             title : "old title",
             completed : false,
-            userId : userId
+            userId : userId,
+            ...todoTimestamps
         });
 
         const result = await service.deleteTodo(todoId, otherUserId, "user");

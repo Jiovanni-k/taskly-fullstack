@@ -24,6 +24,7 @@ export const getTodos =  async ( req: Request, res: Response ) => {
         return res.status(200).json(todo);
     }
     catch( _error ){
+        console.error(_error);
        return res.status(500).json({
             message : "Error displaying todos."
         })

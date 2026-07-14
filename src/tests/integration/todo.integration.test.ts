@@ -84,7 +84,9 @@ describe ("Todo list integration tests.", ( )=>{
             id : id,
             title : "Test Creation",
             completed : false,
-            userId : userAId
+            userId : userAId,
+            createdAt : expect.any(String),
+            updatedAt : expect.any(String)
         });
     });
 
@@ -124,7 +126,9 @@ describe ("Todo list integration tests.", ( )=>{
             id : id,
             title : "new title",
             completed : true,
-            userId : userAId
+            userId : userAId,
+            createdAt : expect.any(String),
+            updatedAt : expect.any(String)
         });
     });
 

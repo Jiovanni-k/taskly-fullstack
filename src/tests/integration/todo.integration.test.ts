@@ -50,6 +50,23 @@ describe ("Todo list integration tests.", ( )=>{
             expect(response.status).toBe(200);
             expect(response.body).toHaveLength(2);
         });
+
+        it("should sort todos by updatedAt", async()=>{
+            const first = await request(app).post("/todos").set("Authorization", `Bearer ${userAToken}`).send({ title : "First" });
+            const second = await request(app).post("/todos").set("Authorization", `Bearer ${userAToken}`).send({ title : "Second" });
+
+            // Editing "First" after "Second" was created makes First's updatedAt the most recent.
+            await request(app)
+                .put(`/todos/${first.body.id}`)
+                .set("Authorization", `Bearer ${userAToken}`)
+                .send({ title : "First - edited", completed : true });
+
+            const response = await request(app).get("/todos?sortBy=updatedAt&order=desc");
+
+            expect(response.status).toBe(200);
+            expect(response.body.data[0].id).toBe(first.body.id);
+            expect(response.body.data[1].id).toBe(second.body.id);
+        });
     });
 
     describe("Everything else requires authentication", ()=>{

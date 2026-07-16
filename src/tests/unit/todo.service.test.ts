@@ -2,6 +2,7 @@ import { beforeEach, describe , expect, it , vi} from "vitest";
 import * as service from "../../services/todo.service.js";
 import * as repository from "../../repositories/todo.repository.js";
 import * as userRepository from "../../repositories/user.repository.js";
+import { parseQueryParams } from "../../utils/queryBuilder.js";
 // Only tests the methods in the service layer.
 
 vi.mock("../../repositories/todo.repository.js");
@@ -164,4 +165,31 @@ describe ("Todo list Service testing",  ()=>{
         const result = await service.deleteTodo(todoId, otherUserId, "user");
         expect ( result ).toEqual({ error : "FORBIDDEN" });
     })
+});
+
+describe("parseQueryParams", () => {
+    it("should default sortBy to createdAt when not provided", () => {
+        const result = parseQueryParams({});
+        expect(result.sortBy).toBe("createdAt");
+    });
+
+    it("should accept updatedAt as a valid sortBy value", () => {
+        const result = parseQueryParams({ sortBy: "updatedAt" });
+        expect(result.sortBy).toBe("updatedAt");
+    });
+
+    it("should fall back to createdAt for an invalid sortBy value", () => {
+        const result = parseQueryParams({ sortBy: "notARealField" });
+        expect(result.sortBy).toBe("createdAt");
+    });
+
+    it("should default order to asc when not provided", () => {
+        const result = parseQueryParams({});
+        expect(result.order).toBe("asc");
+    });
+
+    it("should accept desc as a valid order value", () => {
+        const result = parseQueryParams({ order: "desc" });
+        expect(result.order).toBe("desc");
+    });
 });

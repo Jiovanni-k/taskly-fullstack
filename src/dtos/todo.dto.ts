@@ -9,7 +9,7 @@ export interface FilterQuery{
 }
 
 export interface SortingQuery{
-    sortBy?: 'createdAt' | 'title' | 'completed';
+    sortBy?: 'createdAt' | 'title' | 'completed'| 'updatedAt';
     order?: 'asc' | 'desc';
 }
 

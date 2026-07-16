@@ -3,7 +3,7 @@ import { TodoQuery } from '../dtos/todo.dto.js';
 const DEFAULT_PAGE=1;
 const DEFAULT_LIMIT=10;
 const DEFAULT_MAX_LIMIT=100;
-const VALID_SORT_BY=['createdAt','title','completed'];
+const VALID_SORT_BY=['createdAt','title','completed', 'updatedAt'];
 const VALID_ORDER_BY=['asc','desc'];
 
 export const parseQueryParams = ( query: any ): TodoQuery => {
@@ -19,7 +19,7 @@ export const parseQueryParams = ( query: any ): TodoQuery => {
     if ( limit > DEFAULT_MAX_LIMIT)
         limit = DEFAULT_MAX_LIMIT;
     
-    let sortBy: 'createdAt' | 'title' | 'completed' = 'createdAt';
+    let sortBy: 'createdAt' | 'title' | 'completed' | 'updatedAt' = 'createdAt';
     if ( query.sortBy && VALID_SORT_BY.includes(query.sortBy) )
         sortBy = query.sortBy;
 

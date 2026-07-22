@@ -1,6 +1,5 @@
-
 import { prisma } from "../config/prisma.js";
-import { TodoQuery} from "../dtos/todo.dto.js";
+import { TodoQuery, TodoWhereFilter, TodoOrderBy } from "../dtos/todo.dto.js";
 
 export const findAll= async ( query?:TodoQuery) =>{
 
@@ -10,7 +9,7 @@ export const findAll= async ( query?:TodoQuery) =>{
 
    const { page, limit, sortBy, order, completed, title } = query;
 
-   const where: any = {};
+   const where: TodoWhereFilter = {};
 
    if ( completed !== undefined ){
     where.completed=completed;
@@ -23,7 +22,7 @@ export const findAll= async ( query?:TodoQuery) =>{
     }
    }
 
-   const orderBy: any ={};
+   const orderBy: TodoOrderBy = {};
 
    orderBy[sortBy || 'createdAt']= order || 'desc';
 

@@ -1,10 +1,18 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import * as service from "../../services/user.service.js";
-import * as repository from "../../repositories/user.repository.js";
 import { hashPassword } from "../../utils/hash.js";
+import { prisma } from "../../config/prisma.js";
 // Only tests the methods in the service layer.
 
-vi.mock("../../repositories/user.repository.js");
+vi.mock("../../config/prisma.js", () => ({
+    prisma: {
+        user: {
+            findUnique: vi.fn(),
+            create: vi.fn(),
+            findMany: vi.fn()
+        }
+    }
+}));
 
 describe("User Service testing", () => {
     const userId = "11111111-1111-4111-8111-111111111111";
@@ -12,7 +20,7 @@ describe("User Service testing", () => {
     const password = "password123";
 
     beforeEach(() => {
-        vi.clearAllMocks();
+        vi.resetAllMocks();
     });
 
     describe("register", () => {
@@ -29,7 +37,7 @@ describe("User Service testing", () => {
         });
 
         it("should throw error when email already exists", async () => {
-            vi.mocked(repository.findByEmail).mockResolvedValue({
+            vi.mocked(prisma.user.findUnique).mockResolvedValue({
                 id: userId,
                 email,
                 password: "hashed",
@@ -42,8 +50,8 @@ describe("User Service testing", () => {
         });
 
         it("should register a new user", async () => {
-            vi.mocked(repository.findByEmail).mockResolvedValue(null);
-            vi.mocked(repository.createUser).mockResolvedValue({
+            vi.mocked(prisma.user.findUnique).mockResolvedValue(null);
+            vi.mocked(prisma.user.create).mockResolvedValue({
                 id: userId,
                 email,
                 password: "hashed",
@@ -64,7 +72,7 @@ describe("User Service testing", () => {
         });
 
         it("should throw error when user does not exist", async () => {
-            vi.mocked(repository.findByEmail).mockResolvedValue(null);
+            vi.mocked(prisma.user.findUnique).mockResolvedValue(null);
 
             await expect(service.login(email, password)).rejects.toThrow(
                 "Invalid email or password."
@@ -73,7 +81,7 @@ describe("User Service testing", () => {
 
         it("should throw error when password is incorrect", async () => {
             const hashed = await hashPassword(password);
-            vi.mocked(repository.findByEmail).mockResolvedValue({
+            vi.mocked(prisma.user.findUnique).mockResolvedValue({
                 id: userId,
                 email,
                 password: hashed,
@@ -87,7 +95,7 @@ describe("User Service testing", () => {
 
         it("should return a token and the user on success", async () => {
             const hashed = await hashPassword(password);
-            vi.mocked(repository.findByEmail).mockResolvedValue({
+            vi.mocked(prisma.user.findUnique).mockResolvedValue({
                 id: userId,
                 email,
                 password: hashed,
@@ -107,7 +115,7 @@ describe("User Service testing", () => {
 
     describe("listUsers", () => {
         it("should return all users without passwords", async () => {
-            vi.mocked(repository.findAll).mockResolvedValue([
+            vi.mocked(prisma.user.findMany).mockResolvedValue([
                 {
                     id: userId,
                     email,
@@ -118,11 +126,11 @@ describe("User Service testing", () => {
                     email: "admin@gmail.com",
                     role: "admin"
                 }
-            ]);
+            ] as Awaited<ReturnType<typeof prisma.user.findMany>>);
 
             const result = await service.listUsers();
 
-            expect(repository.findAll).toHaveBeenCalled();
+            expect(prisma.user.findMany).toHaveBeenCalled();
             expect(result).toEqual([
                 {
                     id: userId,

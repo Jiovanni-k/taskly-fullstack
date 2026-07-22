@@ -17,6 +17,18 @@ export interface TodoQuery extends PaginationQuery, FilterQuery, SortingQuery{
 
 }
 
+export interface TodoWhereFilter {
+    completed?: boolean;
+    title?: { contains: string; mode: "insensitive" };
+}
+
+export interface TodoOrderBy {
+    createdAt?: "asc" | "desc";
+    title?: "asc" | "desc";
+    completed?: "asc" | "desc";
+    updatedAt?: "asc" | "desc";
+}
+
 export interface TodoListResponse{
     data : Array<{
         id : string;
@@ -33,4 +45,3 @@ export interface TodoListResponse{
         pages: number;
     };
 }
-

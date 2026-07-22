@@ -9,8 +9,8 @@ export const getTodos =  async ( req: Request, res: Response ) => {
         const query = hasQueryParams ? parseQueryParams(req.query) : undefined;
         const todo = await service.getAllTodos(query);
 
-        if (query){
-            const { todos, total }= todo as any;
+        if (query && "todos" in todo){
+            const { todos, total } = todo;
             const pages = Math.ceil(total / query.limit);
             return res.status(200).json({
                 data: todos,
@@ -55,6 +55,7 @@ try {
     }
     
     catch ( _error ){
+        console.error(_error);
        return res.status(500).json({
             message : "Error creating todo."
         })
@@ -79,6 +80,7 @@ export const getTodoById =  async ( req: Request , res : Response ) => {
         return res.status(200).json(todo);
     }
     catch( _error ){
+         console.error(_error);
         return res.status(500).json({
             message : "Error displaying todo."
         })
@@ -94,28 +96,11 @@ export const updateTodo = async ( req : Request, res: Response ) => {
      const id = String ( req.params.id );
 
         try {
-            const todo = await service.updateTodo(id, title, completed, req.user!.id, req.user!.role);
-
-            if ( !todo ){
-                return res.status(404).json({
-                    message : "Todo Not Found :("
-                });
-            }
-            
-            if ( "error" in todo ){
-                if ( todo.error === "FORBIDDEN" ){
-                    return res.status(403).json({
-                        message : "Forbidden. You do not have permission to modify this todo."
-                    });
-                }
-                return res.status(400).json({
-                    message : "Title and Completed are required."
-                });
-            }
-
-          return res.status(200).json(todo);
+            const todo = await service.updateTodo(id, title, completed);
+            return res.status(200).json(todo);
         }
         catch ( _error ){
+             console.error(_error);
            return res.status(500).json({
                 message : "Error Updating the todo."
             })
@@ -143,6 +128,7 @@ export const deleteTodo = async ( req:Request, res:Response )=>{
         
     }
     catch ( _error ){
+         console.error(_error);
        return res.status(500).json({
             message : "Error Deleting the Todo."
         })

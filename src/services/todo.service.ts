@@ -44,25 +44,8 @@ export const createTodo = async ( title : string, userId:string)=>{
     return await repository.insert(title, userId);
 }
 
-export const updateTodo = async ( id :string, title: string, completed:boolean, requesterId:string, requesterRole:string )=>{
-
-if ( title === undefined || completed === undefined ){
-       return { error : "MISSING_FIELD"};
-        }
-
-    const exist = await repository.findById(id);
-
-    if (!exist) {
-        return null;
-    }
-
-    if ( !isOwner(exist.userId, requesterId, requesterRole)){
-        return { error : "FORBIDDEN"};
-    }
-    
-        
-        return await repository.update(id,title,completed);
-    
+export const updateTodo = async ( id :string, title: string, completed:boolean )=>{
+    return await repository.update(id, title, completed);
 }
 
 export const deleteTodo = async ( id : string, requesterId:string, requesterRole:string )=>{

@@ -17,6 +17,7 @@ export const register = async(req: Request, res:Response)=>{
         });
     }
     catch (error: unknown){
+        console.log(error);
         return res.status(400).json({
             message : getErrorMessage(error)
         });
@@ -31,6 +32,7 @@ export const login = async ( req:Request,res:Response)=>{
         return res.status(200).json(result);
     }
     catch (error: unknown){
+        console.log(error);
         return res.status(401).json({
             message : getErrorMessage(error)
         });
@@ -49,6 +51,7 @@ export const listUsers = async(req: Request, res:Response)=>{
         return res.status(200).json(users);
     }
     catch (_error){
+        console.log(_error);
         return res.status(500).json({
             message : "Error listing users."
         });

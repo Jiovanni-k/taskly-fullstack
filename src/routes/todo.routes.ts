@@ -1,6 +1,8 @@
 import express from "express";
 import { getTodos, createTodos, getTodoById, updateTodo, deleteTodo } from "../controllers/todo.controller.js";
 import { validation } from "../middleware/validateTodo.middleware.js";
+import { validateUpdateTodo } from "../middleware/validateUpdateTodo.middleware.js";
+import { authorizeTodoOwner } from "../middleware/authorizeTodoOwner.middleware.js";
 import {validateUuid} from "../middleware/validateUuid.middleware.js";
 import { authenticate} from "../middleware/auth.middleware.js";
 
@@ -27,7 +29,7 @@ const router = express.Router();
  *         schema: { type: string }
  *       - in: query
  *         name: sortBy
- *         schema: { type: string, enum: [createdAt, title, completed] }
+ *         schema: { type: string, enum: [createdAt, title, completed, updatedAt] }
  *       - in: query
  *         name: order
  *         schema: { type: string, enum: [asc, desc] }
@@ -133,7 +135,7 @@ router.get("/:id", authenticate, validateUuid,getTodoById);
  *       403: { description: Forbidden }
  *       404: { description: Not found }
  */
-router.put("/:id" , authenticate, validateUuid,updateTodo);
+router.put("/:id" , authenticate, validateUuid, validateUpdateTodo, authorizeTodoOwner, updateTodo);
 
 /**
  * @openapi

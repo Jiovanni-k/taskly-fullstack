@@ -1,12 +1,26 @@
 import { beforeEach, describe , expect, it , vi} from "vitest"; 
 import * as service from "../../services/todo.service.js";
-import * as repository from "../../repositories/todo.repository.js";
-import * as userRepository from "../../repositories/user.repository.js";
 import { parseQueryParams } from "../../utils/queryBuilder.js";
+import { prisma } from "../../config/prisma.js";
 // Only tests the methods in the service layer.
 
-vi.mock("../../repositories/todo.repository.js");
-vi.mock("../../repositories/user.repository.js");
+vi.mock("../../config/prisma.js", () => ({
+    prisma: {
+        user: {
+            findUnique: vi.fn(),
+            create: vi.fn(),
+            findMany: vi.fn()
+        },
+        todos: {
+            findMany: vi.fn(),
+            count: vi.fn(),
+            create: vi.fn(),
+            findUnique: vi.fn(),
+            update: vi.fn(),
+            delete: vi.fn()
+        }
+    }
+}));
 
 
 describe ("Todo list Service testing",  ()=>{
@@ -20,7 +34,7 @@ describe ("Todo list Service testing",  ()=>{
     };
 
     beforeEach(() => {
-        vi.clearAllMocks();
+        vi.resetAllMocks();
     });
 
     it("should return error when title is empty", async ()=>{
@@ -29,13 +43,13 @@ describe ("Todo list Service testing",  ()=>{
     });
 
     it("should create todo",  async()=>{
-        vi.mocked(userRepository.findById).mockResolvedValue({
+        vi.mocked(prisma.user.findUnique).mockResolvedValue({
             id: userId,
             email: "test@gmail.com",
             password: "hashed",
             role: "user"
         });
-        vi.mocked(repository.insert).mockResolvedValue({
+        vi.mocked(prisma.todos.create).mockResolvedValue({
             id : todoId,
             title : "Clean Room",
             completed : false,
@@ -50,41 +64,18 @@ describe ("Todo list Service testing",  ()=>{
     })
 
     it ("should return every todo regardless of who is asking (public route)", async()=>{
-        vi.mocked(repository.findAll).mockResolvedValue([
+        vi.mocked(prisma.todos.findMany).mockResolvedValue([
             { id : todoId, title : "mine", completed : false, userId : userId, ...todoTimestamps },
             { id : "other-id", title : "not mine", completed : false, userId : otherUserId, ...todoTimestamps }
         ]);
 
         const result = await service.getAllTodos();
-        expect(repository.findAll).toHaveBeenCalled();
+        expect(prisma.todos.findMany).toHaveBeenCalled();
         expect(result).toHaveLength(2);
     })
 
-    it ("should return error when fields are missing", async()=>{
-        const result = await service.updateTodo(todoId,undefined as unknown as string, true, userId, "user");
-
-        expect(result).toEqual({error : "MISSING_FIELD"});
-
-    });
-
-    it ("should return null if todo does not exist", async()=>{
-        vi.mocked(repository.findById).mockResolvedValue(null);
-
-        const result = await service.updateTodo(todoId,"Clean Room",true, userId, "user");
-        expect(result).toBeNull();
-
-    });
-
-    it ("should update todo successfully when the requester is the owner", async()=>{
-        vi.mocked(repository.findById).mockResolvedValue({
-            id : todoId,
-            title : "old title",
-            completed : false,
-            userId : userId,
-            ...todoTimestamps
-        });
-
-        vi.mocked(repository.update).mockResolvedValue({
+    it ("should update the todo via the repository", async()=>{
+        vi.mocked(prisma.todos.update).mockResolvedValue({
             id : todoId,
             title : "new title",
             completed : true,
@@ -92,46 +83,12 @@ describe ("Todo list Service testing",  ()=>{
             ...todoTimestamps
         });
 
-        const result = await service.updateTodo(todoId,"new title", true, userId, "user");
-        expect ( result ).toMatchObject ({
-            id : todoId, 
-            title : "new title", 
-            completed : true,
-            userId : userId
+        const result = await service.updateTodo(todoId,"new title", true);
+
+        expect(prisma.todos.update).toHaveBeenCalledWith({
+            where : { id : todoId },
+            data : { title : "new title", completed : true }
         });
-    })
-
-    it ("should return FORBIDDEN when a non-owner, non-admin tries to update", async()=>{
-        vi.mocked(repository.findById).mockResolvedValue({
-            id : todoId,
-            title : "old title",
-            completed : false,
-            userId : userId,
-            ...todoTimestamps
-        });
-
-        const result = await service.updateTodo(todoId,"new title", true, otherUserId, "user");
-        expect ( result ).toEqual({ error : "FORBIDDEN" });
-    })
-
-    it ("should allow an admin to update someone else's todo", async()=>{
-        vi.mocked(repository.findById).mockResolvedValue({
-            id : todoId,
-            title : "old title",
-            completed : false,
-            userId : userId,
-            ...todoTimestamps
-        });
-
-        vi.mocked(repository.update).mockResolvedValue({
-            id : todoId,
-            title : "new title",
-            completed : true,
-            userId : userId,
-            ...todoTimestamps
-        });
-
-        const result = await service.updateTodo(todoId,"new title", true, otherUserId, "admin");
         expect ( result ).toMatchObject ({
             id : todoId, 
             title : "new title", 
@@ -141,7 +98,7 @@ describe ("Todo list Service testing",  ()=>{
     })
 
     it ("should return FORBIDDEN when a non-owner, non-admin tries to view someone else's todo", async()=>{
-        vi.mocked(repository.findById).mockResolvedValue({
+        vi.mocked(prisma.todos.findUnique).mockResolvedValue({
             id : todoId,
             title : "old title",
             completed : false,
@@ -154,7 +111,7 @@ describe ("Todo list Service testing",  ()=>{
     })
 
     it ("should return FORBIDDEN when a non-owner, non-admin tries to delete", async()=>{
-        vi.mocked(repository.findById).mockResolvedValue({
+        vi.mocked(prisma.todos.findUnique).mockResolvedValue({
             id : todoId,
             title : "old title",
             completed : false,

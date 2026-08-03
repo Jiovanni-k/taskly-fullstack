@@ -1,10 +1,16 @@
-import express from "express";
-import { getTodos, createTodos, getTodoById, updateTodo, deleteTodo } from "../controllers/todo.controller.js";
-import { validation } from "../middleware/validateTodo.middleware.js";
-import { validateUpdateTodo } from "../middleware/validateUpdateTodo.middleware.js";
-import { authorizeTodoOwner } from "../middleware/authorizeTodoOwner.middleware.js";
-import {validateUuid} from "../middleware/validateUuid.middleware.js";
-import { authenticate} from "../middleware/auth.middleware.js";
+import express from 'express';
+import {
+  getTodos,
+  createTodos,
+  getTodoById,
+  updateTodo,
+  deleteTodo,
+} from '../controllers/todo.controller.js';
+import { validation } from '../middleware/validateTodo.middleware.js';
+import { validateUpdateTodo } from '../middleware/validateUpdateTodo.middleware.js';
+import { authorizeTodoOwner } from '../middleware/authorizeTodoOwner.middleware.js';
+import { validateUuid } from '../middleware/validateUuid.middleware.js';
+import { authenticate } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
@@ -43,7 +49,7 @@ const router = express.Router();
  *               items:
  *                 $ref: '#/components/schemas/Todo'
  */
-router.get("/", getTodos);
+router.get('/', getTodos);
 
 /**
  * @openapi
@@ -72,7 +78,7 @@ router.get("/", getTodos);
  *       401: { description: Unauthorized }
  *       400: { description: Missing title }
  */
-router.post("/", authenticate, validation ,createTodos);
+router.post('/', authenticate, validation, createTodos);
 
 /**
  * @openapi
@@ -98,7 +104,7 @@ router.post("/", authenticate, validation ,createTodos);
  *       403: { description: Forbidden }
  *       404: { description: Not found }
  */
-router.get("/:id", authenticate, validateUuid,getTodoById);
+router.get('/:id', authenticate, validateUuid, getTodoById);
 
 /**
  * @openapi
@@ -135,7 +141,7 @@ router.get("/:id", authenticate, validateUuid,getTodoById);
  *       403: { description: Forbidden }
  *       404: { description: Not found }
  */
-router.put("/:id" , authenticate, validateUuid, validateUpdateTodo, authorizeTodoOwner, updateTodo);
+router.put('/:id', authenticate, validateUuid, validateUpdateTodo, authorizeTodoOwner, updateTodo);
 
 /**
  * @openapi
@@ -156,6 +162,6 @@ router.put("/:id" , authenticate, validateUuid, validateUpdateTodo, authorizeTod
  *       403: { description: Forbidden }
  *       404: { description: Not found }
  */
-router.delete("/:id",authenticate, validateUuid, deleteTodo);
+router.delete('/:id', authenticate, validateUuid, deleteTodo);
 
 export default router;

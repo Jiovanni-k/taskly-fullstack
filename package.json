@@ -13,7 +13,9 @@
     "test:coverage": "vitest run --coverage",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-     "mcp": "tsx src/mcp/index.ts"
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "mcp": "tsx src/mcp/index.ts"
   },
   "keywords": [],
   "author": "",
@@ -47,6 +49,7 @@
     "@vitest/coverage-v8": "^4.1.9",
     "eslint": "^10.6.0",
     "globals": "^17.7.0",
+    "prettier": "3.9.6",
     "supertest": "^7.2.2",
     "tsx": "^4.22.4",
     "typescript": "^6.0.3",

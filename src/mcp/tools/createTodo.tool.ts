@@ -1,14 +1,17 @@
 import { createTodo } from "../../services/todo.service.js";
 
+interface CreateTodoToolArgs {
+    title?: string;
+}
 
-export async function createTodoTool(args:any) {
+export async function createTodoTool(args?: CreateTodoToolArgs) {
 
 
     const DEMO_USER_ID = "8ec8cce9-88bd-4c28-80aa-6f4daf5d4741";
-
+    const title = typeof args?.title === "string" ? args.title : "";
 
     const todo = await createTodo(
-        args.title,
+        title,
         DEMO_USER_ID
     );
 

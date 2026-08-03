@@ -6,12 +6,15 @@ const DEMO_USER = {
     role: "user"
 };
 
+interface DeleteTodoToolArgs {
+    id?: string;
+}
 
-export async function deleteTodoTool(args:any) {
+export async function deleteTodoTool(args?: DeleteTodoToolArgs) {
 
 
     const result = await todoService.deleteTodo(
-        args.id,
+        args?.id ?? "",
         DEMO_USER.id,
         DEMO_USER.role
     );

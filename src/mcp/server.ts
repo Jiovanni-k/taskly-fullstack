@@ -9,9 +9,30 @@ import { getTodoByIdTool } from "./tools/getTodoById.tool.js";
 import { updateTodoTool } from "./tools/updateTodo.tool.js";
 
 import { deleteTodoTool } from "./tools/deleteTodo.tool.js";
+import type { MCPAuthRequest } from "./auth.js";
 
+type ToolCallParams = {
+    name?: string;
+    arguments?: Record<string, unknown>;
+};
 
-export async function handleRequest(request:any) {
+const getToolCallParams = (request: MCPAuthRequest): ToolCallParams => {
+    const params = request.params as Record<string, unknown> | undefined;
+    const name = typeof params?.name === "string" ? params.name : undefined;
+    const rawArguments = params?.arguments;
+
+    const argumentsValue =
+        rawArguments && typeof rawArguments === "object" && !Array.isArray(rawArguments)
+            ? (rawArguments as Record<string, unknown>)
+            : undefined;
+
+    return {
+        name,
+        arguments: argumentsValue
+    };
+};
+
+export async function handleRequest(request: MCPAuthRequest) {
 
 
     console.error(
@@ -19,6 +40,7 @@ export async function handleRequest(request:any) {
         request.method
     );
 
+    const toolCall = getToolCallParams(request);
 
     switch(request.method) {
 
@@ -197,12 +219,12 @@ export async function handleRequest(request:any) {
         case "tools/call":
 
 
-if(request.params.name === "create_todo") {
+if(toolCall.name === "create_todo") {
 
 
     const result =
         await createTodoTool(
-            request.params.arguments
+            toolCall.arguments
         );
 
 
@@ -218,12 +240,12 @@ if(request.params.name === "create_todo") {
 
 }
 
-if(request.params.name === "get_todo_by_id") {
+if(toolCall.name === "get_todo_by_id") {
 
 
     const result =
         await getTodoByIdTool(
-            request.params.arguments
+            toolCall.arguments
         );
 
 
@@ -239,12 +261,12 @@ if(request.params.name === "get_todo_by_id") {
 
 }
 
-if(request.params.name === "update_todo") {
+if(toolCall.name === "update_todo") {
 
 
     const result =
         await updateTodoTool(
-            request.params.arguments
+            toolCall.arguments
         );
 
 
@@ -260,12 +282,12 @@ if(request.params.name === "update_todo") {
 
 }
 
-if(request.params.name === "delete_todo") {
+if(toolCall.name === "delete_todo") {
 
 
     const result =
         await deleteTodoTool(
-            request.params.arguments
+            toolCall.arguments
         );
 
 
@@ -283,7 +305,7 @@ if(request.params.name === "delete_todo") {
 
 
 
-if(request.params.name === "list_todos") {
+if(toolCall.name === "list_todos") {
 
 
     const result =

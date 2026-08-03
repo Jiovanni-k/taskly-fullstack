@@ -6,12 +6,15 @@ const DEMO_USER = {
     role: "user"
 };
 
+interface GetTodoByIdToolArgs {
+    id?: string;
+}
 
-export async function getTodoByIdTool(args: any) {
+export async function getTodoByIdTool(args?: GetTodoByIdToolArgs) {
 
 
     const todo = await todoService.getTodoById(
-        args.id,
+        args?.id ?? "",
         DEMO_USER.id,
         DEMO_USER.role
     );

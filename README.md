@@ -56,6 +56,25 @@ The API is exposed on `http://localhost:3001` in Docker. The database is exposed
 npm run dev
 ```
 
+## Frontend
+
+The React/Vite frontend lives in `frontend/`. Start the API in one terminal, then start the frontend in another:
+
+```bash
+npm run dev
+npm run frontend:dev
+```
+
+Open `http://localhost:5173`. During development, Vite proxies `/api` requests to the API at `http://localhost:3000`.
+
+For a separately deployed frontend, copy `frontend/.env.example` to `frontend/.env` and set `VITE_API_URL` to the public API URL. If the frontend is on a different origin, set the backend `CORS_ORIGIN` environment variable to that origin (or a comma-separated list of allowed origins).
+
+Build the frontend with:
+
+```bash
+npm run frontend:build
+```
+
 For production:
 
 ```bash
@@ -65,18 +84,18 @@ npm start
 
 ## Endpoints
 
-| Method | Endpoint | Authentication | Description |
-| --- | --- | --- | --- |
-| GET | `/health` | No | Health check |
-| POST | `/users/register` | No | Register a user |
-| POST | `/users/login` | No | Receive a JWT |
-| GET | `/users/me` | Bearer token | Current user |
-| GET | `/users` | Admin token | List users |
-| GET | `/todos` | No | List to-dos; accepts filters and pagination |
-| POST | `/todos` | Bearer token | Create a to-do |
-| GET | `/todos/:id` | Owner or admin | Get a to-do |
-| PUT | `/todos/:id` | Owner or admin | Update a to-do |
-| DELETE | `/todos/:id` | Owner or admin | Delete a to-do |
+| Method | Endpoint          | Authentication | Description                                 |
+| ------ | ----------------- | -------------- | ------------------------------------------- |
+| GET    | `/health`         | No             | Health check                                |
+| POST   | `/users/register` | No             | Register a user                             |
+| POST   | `/users/login`    | No             | Receive a JWT                               |
+| GET    | `/users/me`       | Bearer token   | Current user                                |
+| GET    | `/users`          | Admin token    | List users                                  |
+| GET    | `/todos`          | No             | List to-dos; accepts filters and pagination |
+| POST   | `/todos`          | Bearer token   | Create a to-do                              |
+| GET    | `/todos/:id`      | Owner or admin | Get a to-do                                 |
+| PUT    | `/todos/:id`      | Owner or admin | Update a to-do                              |
+| DELETE | `/todos/:id`      | Owner or admin | Delete a to-do                              |
 
 Use `Authorization: Bearer <token>` for authenticated endpoints. Interactive API documentation is available at `/api-docs`.
 

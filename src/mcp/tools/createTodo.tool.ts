@@ -16,7 +16,7 @@ export async function createTodoTool(args?: CreateTodoToolArgs) {
         {
           type: 'text',
           text: `Error creating todo: ${todo.error}`,
-        },
+        }, 
       ],
     };
   }

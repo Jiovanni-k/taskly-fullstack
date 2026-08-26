@@ -1,47 +1,65 @@
 import { TodoQuery } from '../dtos/todo.dto.js';
+import { ParsedQs } from 'qs';
 
-const DEFAULT_PAGE=1;
-const DEFAULT_LIMIT=10;
-const DEFAULT_MAX_LIMIT=100;
-const VALID_SORT_BY=['createdAt','title','completed', 'updatedAt'];
-const VALID_ORDER_BY=['asc','desc'];
+const DEFAULT_PAGE = 1;
+const DEFAULT_LIMIT = 10;
+const DEFAULT_MAX_LIMIT = 100;
+const VALID_SORT_BY = ['createdAt', 'title', 'completed', 'updatedAt'];
+const VALID_ORDER_BY = ['asc', 'desc'];
 
-export const parseQueryParams = ( query: any ): TodoQuery => {
-    let page = parseInt(query.page) || DEFAULT_PAGE;
-    let limit = parseInt( query.limit) || DEFAULT_LIMIT;
+type QueryValue = string | boolean | ParsedQs | (string | ParsedQs)[] | undefined;
+type QueryParams = Record<string, QueryValue>;
 
-    if ( page < 1 )
-        page = DEFAULT_PAGE;
-    
-    if ( limit < 1)
-        limit = DEFAULT_LIMIT;
-    
-    if ( limit > DEFAULT_MAX_LIMIT)
-        limit = DEFAULT_MAX_LIMIT;
-    
-    let sortBy: 'createdAt' | 'title' | 'completed' | 'updatedAt' = 'createdAt';
-    if ( query.sortBy && VALID_SORT_BY.includes(query.sortBy) )
-        sortBy = query.sortBy;
+const firstValue = (value: QueryValue): string | boolean | undefined => {
+  const scalar = Array.isArray(value) ? value[0] : value;
+  return typeof scalar === 'string' || typeof scalar === 'boolean' ? scalar : undefined;
+};
 
-    let order: 'asc' | 'desc' = 'asc';
-    if ( query.order && VALID_ORDER_BY.includes(query.order.toLowerCase())){
-        order = query.order.toLowerCase();
-    }
+export const parseQueryParams = (query: QueryParams): TodoQuery => {
+  const pageValue = firstValue(query.page);
+  const limitValue = firstValue(query.limit);
+  const sortByValue = firstValue(query.sortBy);
+  const orderValue = firstValue(query.order);
+  const completedValue = firstValue(query.completed);
+  const titleValue = firstValue(query.title);
 
-    let completed: boolean | undefined;
-    if ( query.completed !== undefined){
-        completed = query.completed=== "true" || query.completed === true ;
-    }
+  let page = Number.parseInt(String(pageValue), 10) || DEFAULT_PAGE;
+  let limit = Number.parseInt(String(limitValue), 10) || DEFAULT_LIMIT;
 
-    let title: string | undefined;
-    if ( query.title && typeof query.title === "string" && query.title.trim()){
-        title = query.title.trim();
-    }
+  if (page < 1) page = DEFAULT_PAGE;
 
-    return {
-        page, limit, sortBy, order, completed, title
-    }
+  if (limit < 1) limit = DEFAULT_LIMIT;
 
+  if (limit > DEFAULT_MAX_LIMIT) limit = DEFAULT_MAX_LIMIT;
 
+  let sortBy: 'createdAt' | 'title' | 'completed' | 'updatedAt' = 'createdAt';
+  if (typeof sortByValue === 'string' && VALID_SORT_BY.includes(sortByValue)) {
+    sortBy = sortByValue as typeof sortBy;
+  }
 
-}
+  let order: 'asc' | 'desc' = 'asc';
+  if (typeof orderValue === 'string' && VALID_ORDER_BY.includes(orderValue.toLowerCase())) {
+    order = orderValue.toLowerCase() as typeof order;
+  }
+
+  let completed: boolean | undefined;
+  if (completedValue === 'true' || completedValue === true) {
+    completed = true;
+  } else if (completedValue === 'false' || completedValue === false) {
+    completed = false;
+  }
+
+  let title: string | undefined;
+  if (typeof titleValue === 'string' && titleValue.trim()) {
+    title = titleValue.trim();
+  }
+
+  return {
+    page,
+    limit,
+    sortBy,
+    order,
+    completed,
+    title,
+  };
+};

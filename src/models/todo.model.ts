@@ -1,7 +1,8 @@
 export type Todo = {
-    id : string;
-    title : string;
-    completed : boolean;
+  id: string;
+  title: string;
+  completed: boolean | null;
+  userId: string;
+  createdAt: Date;
+  updatedAt: Date;
 };
-
-

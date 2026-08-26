@@ -3,8 +3,8 @@ name: CI
 on:
   push:
     branches:
-      - "features*"
-      - "feature/*"
+      - 'features*'
+      - 'feature/*'
       - main
 
   pull_request:
@@ -18,6 +18,8 @@ jobs:
     env:
       DATABASE_URL: postgresql://postgres:post1234@localhost:5432/todo_api_db
       TEST_DATABASE_URL: postgresql://postgres:post1234@localhost:5432/todo_api_db
+      JWT_SECRET: ci-test-secret-do-not-use-in-production
+      JWT_EXPIRES_IN: 1h
 
     services:
       postgres:

@@ -1,13 +1,13 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction } from 'express';
 
-export const validation = ( req:Request, res:Response, next:NextFunction ) => {
+export const validation = (req: Request, res: Response, next: NextFunction) => {
+  const { title } = req.body;
 
-    const { title , completed }= req.body;
-    if ( !title ){
-        return res.status(400).json({
-            message : "Title is Required!! "
-        });
-    }
+  if (typeof title !== 'string' || title.trim() === '') {
+    return res.status(400).json({
+      message: 'Title is Required!! ',
+    });
+  }
 
-    next();
-}
+  next();
+};

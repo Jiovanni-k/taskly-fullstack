@@ -5,10 +5,16 @@ import { logger } from './middleware/logger.middleware.js';
 import passport from './config/passport.js';
 import swaggerUi from 'swagger-ui-express';
 import { swaggerSpec } from './config/swagger.js';
+import cors from 'cors';
 
 const app = express();
 
 app.use(logger);
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : true,
+  }),
+);
 app.use(express.json());
 app.use(passport.initialize());
 app.use('/todos', router);

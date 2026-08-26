@@ -1,70 +1,122 @@
-import { Request , Response } from "express";
-import { todos } from "../data/todo.js";
+import { Request, Response } from 'express';
+import * as service from '../services/todo.service.js';
+import { parseQueryParams } from '../utils/queryBuilder.js';
 
-export const getTodos = ( req: Request, res: Response ) => {
-    res.json( todos );
-}
+export const getTodos = async (req: Request, res: Response) => {
+  try {
+    const hasQueryParams = Object.keys(req.query).length > 0;
+    const query = hasQueryParams ? parseQueryParams(req.query) : undefined;
+    const todo = await service.getAllTodos(query);
 
-export const createTodos = ( req: Request, res: Response ) => {
-
-    const newTodo = {
-        id:todos.length+1,
-        title: req.body.title,
-        completed :false 
-    };
-    todos.push(newTodo);
-    res.status(201).json(newTodo);
-}
-
-export const getTodoById = ( req: Request , res : Response ) => {
-    const id = Number ( req . params . id );
-    const todo = todos.find( td => td.id === id );
-    if( !todo) {
-        res.status(404).json({
-            message : "Todo Not Found :( "
-        });
+    if (query && 'todos' in todo) {
+      const { todos, total } = todo;
+      const pages = Math.ceil(total / query.limit);
+      return res.status(200).json({
+        data: todos,
+        pagination: {
+          page: query.page,
+          limit: query.limit,
+          total,
+          pages,
+        },
+      });
     }
-
-    res.status(200).json(todo);
-}
-
-export const updateTodo = ( req : Request, res: Response ) => {
-    const todo = todos.find( td => td.id === Number(req.params.id));
-    if ( !todo ){
-        res.status(404).json({
-            message : "Todo Not Found :( "
-        });
-    }
-    else if ( todo ){
-        todo.title = req.body.title ?? todo.title ;
-        todo.completed = req.body.completed ?? todo.completed ;
-    }
-
-    res.json(todo);
-}
-
-export const deleteTodo = ( req : Request , res : Response )=> {
-    const id = Number ( req.params.id);
-    const index = todos.findIndex( td => td.id === id);
-
-    if (index >= 0){
-        todos.splice(index,1);
-        res.status(204).send();
-    }
-    else if ( index === -1 ){
-    res.status(404).json({
-        message : "Todo Not Found :("
+    return res.status(200).json(todo);
+  } catch (_error) {
+    console.error(_error);
+    return res.status(500).json({
+      message: 'Error displaying todos.',
     });
-   }
-    //findIndex does not return a boolean so using a true or false scenario is wrong
-    //it returns a the number of the index and if the index does not exist it returns -1
-    /* else if (!index ){
-        res.status(404).json(
-            {
-                message : "Todo Not Found :( "
-            }
-        );
-    } */
-   
-}
+  }
+};
 
+export const createTodos = async (req: Request, res: Response) => {
+  const { title } = req.body;
+
+  try {
+    const todo = await service.createTodo(title, req.user!.id);
+
+    if (todo && 'error' in todo) {
+      if (todo.error === 'USER_NOT_FOUND') {
+        return res.status(404).json({
+          message: 'User Not Found',
+        });
+      }
+
+      return res.status(400).json({
+        message: 'Title and userId are required.',
+      });
+    }
+    return res.status(201).json(todo);
+  } catch (_error) {
+    console.error(_error);
+    return res.status(500).json({
+      message: 'Error creating todo.',
+    });
+  }
+};
+
+export const getTodoById = async (req: Request, res: Response) => {
+  const id = String(req.params.id);
+  try {
+    const todo = await service.getTodoById(id, req.user!.id, req.user!.role);
+
+    if (!todo) {
+      return res.status(404).json({
+        message: 'Todo Not Found :(',
+      });
+    }
+    if ('error' in todo) {
+      return res.status(403).json({
+        message: 'Forbidden. You do not have permission to access this todo.',
+      });
+    }
+    return res.status(200).json(todo);
+  } catch (_error) {
+    console.error(_error);
+    return res.status(500).json({
+      message: 'Error displaying todo.',
+    });
+  }
+};
+
+export const updateTodo = async (req: Request, res: Response) => {
+  const { title, completed } = req.body;
+
+  const id = String(req.params.id);
+
+  try {
+    const todo = await service.updateTodo(id, title, completed);
+    return res.status(200).json(todo);
+  } catch (_error) {
+    console.error(_error);
+    return res.status(500).json({
+      message: 'Error Updating the todo.',
+    });
+  }
+};
+
+export const deleteTodo = async (req: Request, res: Response) => {
+  const id = String(req.params.id);
+  try {
+    const todo = await service.deleteTodo(id, req.user!.id, req.user!.role);
+
+    if (!todo) {
+      return res.status(404).json({
+        message: 'Todo Not Found:(',
+      });
+    }
+    if ('error' in todo) {
+      return res.status(403).json({
+        message: 'Forbidden. You do not have permission to delete this todo.',
+      });
+    }
+
+    return res.status(204).send();
+  } catch (_error) {
+    console.error(_error);
+    return res.status(500).json({
+      message: 'Error Deleting the Todo.',
+    });
+  }
+};

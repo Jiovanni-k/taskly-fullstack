@@ -7,23 +7,23 @@ The project follows a clean architecture using routes, controllers, and middlewa
 
 ## Features
 
-- Create a todo  
-- Get all todos  
-- Get todo by ID  
-- Update todo  
-- Delete todo  
-- Request logging middleware  
-- Input validation  
-- REST API structure  
+- Create a todo
+- Get all todos
+- Get todo by ID
+- Update todo
+- Delete todo
+- Request logging middleware
+- Input validation
+- REST API structure
 
 ---
 
 ## Tech Stack
 
-- Node.js  
-- Express.js  
-- TypeScript  
-- tsx  
+- Node.js
+- Express.js
+- TypeScript
+- tsx
 
 ---
 
@@ -66,22 +66,22 @@ npm start
 
 ## API Endpoints
 
-Method | Endpoint | Description
------- | -------- | -----------
-GET | /todos | Get all todos
-GET | /todos/:id | Get todo by id
-POST | /todos | Create todo
-PUT | /todos/:id | Update todo
-DELETE | /todos/:id | Delete todo
+| Method | Endpoint   | Description    |
+| ------ | ---------- | -------------- |
+| GET    | /todos     | Get all todos  |
+| GET    | /todos/:id | Get todo by id |
+| POST   | /todos     | Create todo    |
+| PUT    | /todos/:id | Update todo    |
+| DELETE | /todos/:id | Delete todo    |
 
 ---
 
 ## Example Todo
 
 {
-  "id": 1,
-  "title": "Learn Express",
-  "completed": false
+"id": 1,
+"title": "Learn Express",
+"completed": false
 }
 
 ---
